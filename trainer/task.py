@@ -23,8 +23,19 @@ def _preprocess_data(x,y):
     x = x / 255.0
     y = utils.to_categorical(y)
     return x,y
-'''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
 
+def _build_model():
+    m = models.Sequential()
+    m.add(layers.Input((28,28), name='input_layer'))
+    m.add(layers.Flatten())
+    m.add(layers.Dense(128,activation=activations.relu))
+    m.add(layers.Dense(64,activation=activations.relu))
+    m.add(layers.Dense(32,activation=activations.relu))
+    m.add(layers.Dense(10,activation=activations.softmax))
+
+    return m
+
+'''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
 def train_and_evaluate(batch_size,epochs,job_dir,output_path):
 
     #Download the data
@@ -34,7 +45,7 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path):
     X_train, y_train = _preprocess_data(X_train,y_train)
     X_test, y_test  =_preprocess_data(X_test,y_test)
     # Build the model
-
+    model = _build_model()
     #Train the model
 
     #Evaluate the model
