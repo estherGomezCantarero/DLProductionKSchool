@@ -10,26 +10,29 @@ from tensorflow.keras import  activations
 from tensorflow.keras import  optimizers
 from tensorflow.keras import losses
 from tensorflow.keras import metrics
-
-
+from tensorflow.keras import utils
+#Download data function
 def __download_data():
     train, test = datasets.mnist.load_data()
     X_train, y_train = train
     X_test, y_test = test
     return X_train, y_train,X_test,y_test
 
-
-
-
+#Preprocess data function
+def _preprocess_data(x,y):
+    x = x / 255.0
+    y = utils.to_categorical(y)
+    return x,y
 '''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
 
 def train_and_evaluate(batch_size,epochs,job_dir,output_path):
 
     #Download the data
     X_train, y_train, X_test, y_test  = __download_data()
-    
-    #Preprocess the data
 
+    #Preprocess the data
+    X_train, y_train = _preprocess_data(X_train,y_train)
+    X_test, y_test  =_preprocess_data(X_test,y_test)
     # Build the model
 
     #Train the model
