@@ -11,6 +11,7 @@ from tensorflow.keras import  optimizers
 from tensorflow.keras import losses
 from tensorflow.keras import metrics
 from tensorflow.keras import utils
+
 #Download data function
 def __download_data():
     train, test = datasets.mnist.load_data()
@@ -24,6 +25,7 @@ def _preprocess_data(x,y):
     y = utils.to_categorical(y)
     return x,y
 
+#Build the model of the neuronal network
 def _build_model():
     m = models.Sequential()
     m.add(layers.Input((28,28), name='input_layer'))
@@ -35,6 +37,10 @@ def _build_model():
 
     return m
 
+#train model
+def _():
+    pass
+
 '''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
 def train_and_evaluate(batch_size,epochs,job_dir,output_path):
 
@@ -44,9 +50,13 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path):
     #Preprocess the data
     X_train, y_train = _preprocess_data(X_train,y_train)
     X_test, y_test  =_preprocess_data(X_test,y_test)
+
     # Build the model
     model = _build_model()
+    model.compile(optimizer=optimizers.Adam(), metrics=[metrics.categorical_accuracy], loss=losses.categorical_crossentropy)
+
     #Train the model
+    model.fit(X_train,y_train,batch_size=batch_size,epochs=epochs)
 
     #Evaluate the model
 
