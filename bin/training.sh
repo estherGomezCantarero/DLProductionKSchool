@@ -11,7 +11,7 @@ gcloud ai-platform jobs submit training mnist_`date +"%s"` \
     --module-name trainer.task \
     --region europe-west1 \
     --job-dir gs://esther_gomez_cantarero_20210123_kschool/tmp \
-    -- \ 
+    -- \
     --epochs $EPOCHS \
     --batch-size $BATCH_SIZE \
     --model-output-path gs://esther_gomez_cantarero_20210123_kschool/models
