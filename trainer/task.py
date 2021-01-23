@@ -12,8 +12,12 @@ from tensorflow.keras import losses
 from tensorflow.keras import metrics
 from tensorflow.keras import utils
 
+#constante para creo logger
+LOGGER = logging.getLogger()
+
 #Download data function
 def __download_data():
+    LOGGER.info("Downloading data...")
     train, test = datasets.mnist.load_data()
     X_train, y_train = train
     X_test, y_test = test
@@ -21,6 +25,7 @@ def __download_data():
 
 #Preprocess data function
 def _preprocess_data(x,y):
+    LOGGER.info("Preprocessing data...")
     x = x / 255.0
     y = utils.to_categorical(y)
     return x,y
@@ -36,10 +41,6 @@ def _build_model():
     m.add(layers.Dense(10,activation=activations.softmax))
 
     return m
-
-#train model
-def _():
-    pass
 
 '''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
 def train_and_evaluate(batch_size,epochs,job_dir,output_path):
@@ -59,9 +60,9 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path):
     model.fit(X_train,y_train,batch_size=batch_size,epochs=epochs)
 
     #Evaluate the model
-
-
-    pass
+    loss_value, accuracy = model.evaluate(X_test,y_test)
+    LOGGER.info("LOSS VALUE:    %f      ACCURACY:   %.4f" % (loss_value,accuracy))
+    
 
 def main():
     '''Argumentos que se van a introducir'''
