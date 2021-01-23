@@ -14,8 +14,11 @@ from tensorflow.keras import losses
 from tensorflow.keras import metrics
 from tensorflow.keras import utils
 from tensorflow.keras import callbacks
+from . import VERSION
+
 #constante para creo logger
 LOGGER = logging.getLogger()
+VERSION = __version__
 
 #Download data function
 def __download_data():
@@ -74,6 +77,9 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path):
     loss_value, accuracy = model.evaluate(X_test,y_test)
     LOGGER.info("LOSS VALUE:    %f      ACCURACY:   %.4f" % (loss_value,accuracy))
     
+    #Save model in TF SaveModel format
+    model_dir = os.path.join(output_path,VERSION)
+    models.save_model(model, model_dir, save_format='tf')
 
 def main():
     '''Argumentos que se van a introducir'''
