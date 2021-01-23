@@ -2,6 +2,8 @@
 '''Modulo por defecto para poner linea de comandos es argparse'''
 import logging.config
 import argparse
+import os
+import time
 
 from tensorflow.keras import datasets
 from tensorflow.keras import models
@@ -11,7 +13,7 @@ from tensorflow.keras import  optimizers
 from tensorflow.keras import losses
 from tensorflow.keras import metrics
 from tensorflow.keras import utils
-
+from tensorflow.keras import callbacks
 #constante para creo logger
 LOGGER = logging.getLogger()
 
@@ -57,7 +59,16 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path):
     model.compile(optimizer=optimizers.Adam(), metrics=[metrics.categorical_accuracy], loss=losses.categorical_crossentropy)
 
     #Train the model
-    model.fit(X_train,y_train,batch_size=batch_size,epochs=epochs)
+    #decidimos dir donde escribiremos los logs
+    logdir = os.path.join(job_dir,"logs/scalars/"+ time.strftime("%Y%m%d-%H%M%S"))
+    #creamos call back para tensor board
+    td_callback = callbacks.TensorBoard(log_dir=logdir)
+    model.fit(X_train,
+                y_train,
+                batch_size=batch_size,
+                epochs=epochs,
+                callbacks=[td_callback]    
+            )
 
     #Evaluate the model
     loss_value, accuracy = model.evaluate(X_test,y_test)
