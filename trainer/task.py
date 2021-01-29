@@ -14,7 +14,7 @@ from tensorflow.keras import losses
 from tensorflow.keras import metrics
 from tensorflow.keras import utils
 from tensorflow.keras import callbacks
-from . import VERSION
+from . import __version__
 
 #constante para creo logger
 LOGGER = logging.getLogger()
