@@ -5,6 +5,8 @@ import argparse
 import os
 import time
 
+import tensorflow as tf
+
 from tensorflow.keras import datasets
 from tensorflow.keras import models
 from tensorflow.keras import layers
@@ -77,6 +79,20 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune):
     loss_value, accuracy = model.evaluate(X_test,y_test)
     LOGGER.info("LOSS VALUE:    %f      ACCURACY:   %.4f" % (loss_value,accuracy))
     
+    #Communicate results from model evaluation
+    
+    if is_hypertune:
+        '''Writer es un summary de tensro flow'''
+        metric_tag = "accuracy_live_class"
+        eval_path = os.path.join(job_dir,metric_tag)
+        writer = tf.summary.create_file_writer(eval_path)
+        with writer.as_default():
+            '''
+            En este caso usamos accuracy porque es la metrica que hemos puesto en nuestro modelo(se podría poner otras) 
+            y hay que poner un valor de steps, vamos a usar las epocas.#
+            '''
+            tf.summary.scalar(metric_tag, accuracy,step=epochs)
+        writer.fluch()
     #hypertune option
     if not is_hypertune:
         #Save model in TF SaveModel format
