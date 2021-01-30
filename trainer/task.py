@@ -100,7 +100,7 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune):
         models.save_model(model, model_dir, save_format='tf')
 
 def main():
-    '''Argumentos que se van a introducir'''
+    '''Argumentos que se van a introducir (recordar que en yaml los hiper parametros se llaman igual que estos param)'''
     parser = argparse.ArgumentParser()
     parser.add_argument('--batch-size',type=int, help='Batch size for the training')
     parser.add_argument('--epochs',type=int,help='Number of epochs for the training')
