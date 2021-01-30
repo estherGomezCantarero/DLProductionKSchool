@@ -18,3 +18,10 @@ trainingInput:
       - 1024
       - 2048
       - 4096
+    - parameterName: model
+      type: CATEGORICAL
+      categoricalValues:
+      - dense
+      - cnn
+
+      

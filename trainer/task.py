@@ -31,14 +31,16 @@ def __download_data():
     return X_train, y_train,X_test,y_test
 
 #Preprocess data function
-def _preprocess_data(x,y):
+def _preprocess_data(x,y,model):
     LOGGER.info("Preprocessing data...")
     x = x / 255.0
     y = utils.to_categorical(y)
+    if model == 'cnn':
+        x= x.reshape(-1, 28, 28, 1)
     return x,y
 
 #Build the model of the neuronal network
-def _build_model():
+def _build_dense_model():
     m = models.Sequential()
     m.add(layers.Input((28,28), name='input_layer'))
     m.add(layers.Flatten())
@@ -49,19 +51,41 @@ def _build_model():
 
     return m
 
+#New Models
+def _build_conv_model():
+    m = models.Sequential()
+    m.add(layers.Input((28, 28, 1), name='my_input_layer'))
+    m.add(layers.Conv2D(32, (3, 3), activation=activations.relu))
+    m.add(layers.MaxPooling2D((2, 2)))
+    m.add(layers.Conv2D(16, (3, 3), activation=activations.relu))
+    m.add(layers.MaxPooling2D((2, 2)))
+    m.add(layers.Conv2D(8, (3, 3), activation=activations.relu))
+    m.add(layers.MaxPooling2D((2, 2)))
+    m.add(layers.Flatten())
+    m.add(layers.Dense(10, activation=activations.softmax))
+
+    return m 
+
+
 '''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
-def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune):
+def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune,model):
 
     #Download the data
     X_train, y_train, X_test, y_test  = __download_data()
 
     #Preprocess the data
-    X_train, y_train = _preprocess_data(X_train,y_train)
-    X_test, y_test  =_preprocess_data(X_test,y_test)
+    X_train, y_train = _preprocess_data(X_train,y_train,model)
+    X_test, y_test  =_preprocess_data(X_test,y_test,model)
 
+    #if model is conv
+    if model == 'cnn':
+        model = _build_conv_model()
     # Build the model
-    model = _build_model()
+    if model == 'dense':
+        model = _build_dense_model()
     model.compile(optimizer=optimizers.Adam(), metrics=[metrics.categorical_accuracy], loss=losses.categorical_crossentropy)
+    
+ 
 
     #Train the model
     #decidimos dir donde escribiremos los logs
@@ -109,7 +133,7 @@ def main():
     parser.add_argument('--model-output-path', help='Path to write the  SaveModel format')
     #Opcion para el tuneo de hiperparametros
     parser.add_argument('--hypertune',action='store_true',help='This is a hypertuning job')
-    
+    parser.add_argument('--model',help='Model type to choose')
 
     #Recuperamos las opciones
     args = parser.parse_args()
@@ -119,8 +143,9 @@ def main():
     output_path = args.model_output_path
     #hypertune variable
     is_hypertune = args.hypertune
+    model = args.model
 
-    train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune)
+    train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune,model)
 
 if __name__ == "__main__":
     main()
