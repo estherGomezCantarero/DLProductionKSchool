@@ -2,7 +2,7 @@ trainingInput:
   hyperparameters:
     goal: MAXIMIZE
     hyperparameterMetricTag: accuracy_live_class
-    maxTrial: 15
+    maxTrials: 15
     maxParallelTrials: 5
     enableTrialEarlyStopping: True 
     params:
@@ -13,7 +13,7 @@ trainingInput:
       scaleType: UNIT_LINEAR_SCALE
     - parameterName: batch-size
       type: DISCRETE
-      dicreteValues:
+      discreteValues:
       - 512
       - 1024
       - 2048

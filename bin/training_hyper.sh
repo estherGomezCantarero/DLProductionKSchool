@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BUCKET=gs://esther_gomez_cantarero_20210123_kschool/tmp
+BUCKET=esther_gomez_cantarero_20210123_kschool
 
 gcloud ai-platform jobs submit training mnist_int_ht_`date +"%s"` \
     --python-version 3.7 \
@@ -9,7 +9,7 @@ gcloud ai-platform jobs submit training mnist_int_ht_`date +"%s"` \
     --package-path ./trainer \
     --module-name trainer.task \
     --region europe-west1 \
-    --job-dir gs://BUCKET/tmp \
+    --job-dir gs://$BUCKET/tmp \
     --config ./bin/hyper.yaml \
     -- \
-    --model-output-path gs://BUCKET/models
+    --model-output-path gs://$BUCKET/models
