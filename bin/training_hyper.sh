@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BUCKET=esther_gomez_cantarero_20210123_kschool
+BUCKET= esther_gomez_cantarero_20210123_kschool
 
 gcloud ai-platform jobs submit training mnist_int_ht_`date +"%s"` \
     --python-version 3.7 \
@@ -12,4 +12,4 @@ gcloud ai-platform jobs submit training mnist_int_ht_`date +"%s"` \
     --job-dir gs://$BUCKET/tmp \
     --config ./bin/hyper.yaml \
     -- \
-    
+    --hypertune
