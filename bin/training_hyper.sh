@@ -12,4 +12,4 @@ gcloud ai-platform jobs submit training mnist_int_ht_`date +"%s"` \
     --job-dir gs://$BUCKET/tmp \
     --config ./bin/hyper.yaml \
     -- \
-    --model-output-path gs://$BUCKET/models
+    

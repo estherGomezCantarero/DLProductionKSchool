@@ -4,7 +4,7 @@ import logging.config
 import argparse
 import os
 import time
-
+import sys
 import tensorflow as tf
 
 from tensorflow.keras import datasets
@@ -31,11 +31,11 @@ def __download_data():
     return X_train, y_train,X_test,y_test
 
 #Preprocess data function
-def _preprocess_data(x,y,model):
+def _preprocess_data(x,y,needs_reshape):
     LOGGER.info("Preprocessing data...")
     x = x / 255.0
     y = utils.to_categorical(y)
-    if model == 'cnn':
+    if needs_reshape:
         x= x.reshape(-1, 28, 28, 1)
     return x,y
 
@@ -68,21 +68,29 @@ def _build_conv_model():
 
 
 '''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
-def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune,model):
+def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune,model_type):
 
     #Download the data
     X_train, y_train, X_test, y_test  = __download_data()
 
-    #Preprocess the data
-    X_train, y_train = _preprocess_data(X_train,y_train,model)
-    X_test, y_test  =_preprocess_data(X_test,y_test,model)
+
 
     #if model is conv
-    if model == 'cnn':
+    if model_type == 'cnn':
+        #Preprocess the data
+        needs_reshape = True
         model = _build_conv_model()
     # Build the model
-    if model == 'dense':
+    elif model_type == 'dense':
+        needs_reshape = False
         model = _build_dense_model()
+    else:
+        LOGGER.error("Unknown model type")
+        sys.exit(1)
+    #Preprocess the data
+        X_train, y_train = _preprocess_data(X_train,y_train,needs_reshape)
+        X_test, y_test  =_preprocess_data(X_test,y_test,needs_reshape)
+
     model.compile(optimizer=optimizers.Adam(), metrics=[metrics.categorical_accuracy], loss=losses.categorical_crossentropy)
     
  
@@ -130,10 +138,10 @@ def main():
     parser.add_argument('--epochs',type=int,help='Number of epochs for the training')
     parser.add_argument('--job-dir',default=None,required=False, help='Option for AI platform')
     '''El resultado se va a escribir en un fichero save modele de tensorflow y hay que indicar elpath'''
-    parser.add_argument('--model-output-path', help='Path to write the  SaveModel format')
+    parser.add_argument('--model-output-path', help='Path to write the  SaveModel format',default='None')
     #Opcion para el tuneo de hiperparametros
     parser.add_argument('--hypertune',action='store_true',help='This is a hypertuning job')
-    parser.add_argument('--model',help='Model type to choose')
+    parser.add_argument('--model_type',help='Model type to choose',default='dense')
 
     #Recuperamos las opciones
     args = parser.parse_args()
@@ -143,9 +151,17 @@ def main():
     output_path = args.model_output_path
     #hypertune variable
     is_hypertune = args.hypertune
-    model = args.model
+    model_type = args.model_type
 
-    train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune,model)
+    if not model_type in ['dense','cnn']:
+        print('Model error')
+        sys.exit(1)
+
+    if not is_hypertune and output_path is None:
+        print('Please set --model-output-path')
+        sys.exit(1)
+
+    train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune,model_type)
 
 if __name__ == "__main__":
     main()
