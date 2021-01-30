@@ -48,7 +48,7 @@ def _build_model():
     return m
 
 '''Aquí necesitamos una función train and evaluate por convención. AI va a llamar a esta función'''
-def train_and_evaluate(batch_size,epochs,job_dir,output_path):
+def train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune):
 
     #Download the data
     X_train, y_train, X_test, y_test  = __download_data()
@@ -77,9 +77,11 @@ def train_and_evaluate(batch_size,epochs,job_dir,output_path):
     loss_value, accuracy = model.evaluate(X_test,y_test)
     LOGGER.info("LOSS VALUE:    %f      ACCURACY:   %.4f" % (loss_value,accuracy))
     
-    #Save model in TF SaveModel format
-    model_dir = os.path.join(output_path,VERSION)
-    models.save_model(model, model_dir, save_format='tf')
+    #hypertune option
+    if not is_hypertune:
+        #Save model in TF SaveModel format
+        model_dir = os.path.join(output_path,VERSION)
+        models.save_model(model, model_dir, save_format='tf')
 
 def main():
     '''Argumentos que se van a introducir'''
@@ -87,8 +89,11 @@ def main():
     parser.add_argument('--batch-size',type=int, help='Batch size for the training')
     parser.add_argument('--epochs',type=int,help='Number of epochs for the training')
     parser.add_argument('--job-dir',default=None,required=False, help='Option for AI platform')
-    '''El resultado se va  aescribir en un fichero save modele de tensorflow y hay que indicar elpath'''
+    '''El resultado se va a escribir en un fichero save modele de tensorflow y hay que indicar elpath'''
     parser.add_argument('--model-output-path', help='Path to write the  SaveModel format')
+    #Opcion para el tuneo de hiperparametros
+    parser.add_argument('--hypertune',action='store_true',help='This is a hypertuning job')
+    
 
     #Recuperamos las opciones
     args = parser.parse_args()
@@ -96,8 +101,10 @@ def main():
     epochs = args.epochs
     job_dir = args.job_dir
     output_path = args.model_output_path
+    #hypertune variable
+    is_hypertune = args.hypertune
 
-    train_and_evaluate(batch_size,epochs,job_dir,output_path)
+    train_and_evaluate(batch_size,epochs,job_dir,output_path,is_hypertune)
 
 if __name__ == "__main__":
     main()
